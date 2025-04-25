@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "878126192232",
+    "project_id": "productreward-bc1d8",
+    "storage_bucket": "productreward-bc1d8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878126192232:android:80dea18d371660b72c4ddd",
+        "android_client_info": {
+          "package_name": "com.app.productreward"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNcVcEaHWu1F86N6IQ_s3JfuWihBX7QN8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
