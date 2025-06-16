@@ -16,7 +16,7 @@ class NotificationScreen extends StatelessWidget {
         backgroundColor: AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white), // Makes back icon white
       ),
-      body: const NotificationListWidget(),
+      // body: const NotificationListWidget(),
     );
   }
 }

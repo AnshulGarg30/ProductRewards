@@ -21,6 +21,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   bool otpSent = false;
   String? OTPValue = "";
+  int userID = 0;
   String? _otpErrorText;
   bool isLoading = false;
 
@@ -49,9 +50,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final response = await api.forget_Password(emailController.text);
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      print('OTP sent: $data');
-      OTPValue = data['otp'];
+      final bodydata = jsonDecode(response.body);
+      OTPValue = bodydata['otp'];
+
+      Map<String, dynamic> data = bodydata['data'];
+
+      userID = data['id'];
+
+      print('OTP sent: $bodydata ');
+      print('resetpass data: $OTPValue $userID');
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Password reset OTP sent!")),
@@ -92,7 +100,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) =>  ResetPasswordScreen()),
+      MaterialPageRoute(builder: (_) =>  ResetPasswordScreen( userID: userID)),
           (route) => false,
     );
   }

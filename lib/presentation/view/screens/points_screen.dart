@@ -1,54 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:productreward/presentation/themes/colors.dart';
 import 'package:provider/provider.dart';
-import '../../controllers/points_provider.dart';
+import '../../controllers/UserProvider.dart';
 import '../widgets/rewards_list_widget.dart';
 
 class PointsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<PointsProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: provider.isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Container(
-          color: Colors.white38,
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Text(
-                'Total Points: ${provider.points!.total}',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
+        child: SingleChildScrollView(
+          child: Container(
+            color: Colors.white38,
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Text(
+                  'Total Points: ${userProvider.userData?.totalPoint ?? '0'}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                Row(
                   children: [
-                    buildPointBox('Withdrawal\nPoints', provider.points!.withdrawal),
-                    buildPointBox('Remaining\nPoints', provider.points!.remaining),
-                    buildPointBox('Pending\nPoints', provider.points!.pending),
+                    buildPointBox('Withdrawal\nPoints', userProvider.userData?.withdrawalPoint ?? '0'),
+                    buildPointBox('Remaining\nPoints', userProvider.userData?.remainingPoint ?? '0'),
+                    buildPointBox('Pending\nPoints', userProvider.userData?.pendingPoint ?? '0'),
                   ],
                 ),
-              ),
-              const SizedBox(height: 30),
-              Text(
-                'Recent Activity',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              RewardsListWidget()
-            ],
+                const SizedBox(height: 10),
+                // Text(
+                //   'Recent Activity',
+                //   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                // ),
+                const SizedBox(height: 10),
+                RewardsListWidget(),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget buildPointBox(String title, int value) {
+  Widget buildPointBox(String title, String value) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),

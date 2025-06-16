@@ -1,5 +1,8 @@
 plugins {
     id("com.android.application")
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -21,13 +24,14 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.app.productreward"
+        applicationId = "com.weboctopus.archgod"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["applicationName"] = "ArchGod"
     }
 
     buildTypes {
@@ -44,9 +48,5 @@ flutter {
 }
 
 dependencies {
-    implementation("com.google.firebase:firebase-auth:21.0.1")   // Firebase Authentication
-    implementation("com.google.firebase:firebase-core:21.1.0")  // Firebase Core
+
 }
-
-apply(plugin = "com.google.gms.google-services")
-

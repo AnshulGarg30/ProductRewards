@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../data/datasource/auth_local_datasource.dart';
-import '../../domain/repositories/login_auth_repository.dart';
 import '../../domain/usecases/check_login_status.dart';
 import '../../domain/usecases/set_login_status.dart';
 

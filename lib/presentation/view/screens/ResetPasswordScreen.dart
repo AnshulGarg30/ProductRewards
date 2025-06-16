@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:productreward/presentation/view/screens/LoginScreen.dart';
 import '../../../core/network/api_service.dart';
 import '../../../core/utils/validators.dart';
 import '../../themes/colors.dart';
 import '../widgets/custom_text_field.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({Key? key}) : super(key: key);
+  final int? userID;
+  const ResetPasswordScreen({Key? key, required this.userID}) : super(key: key);
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -36,21 +41,32 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         confirmPasswordError = null;
       });
 
-      // final api = ApiService();
-      // final response = await api.resetPassword(widget.email, newPassword); // Customize this call
-      //
-      // setState(() => isLoading = false);
-      //
-      // if (response.statusCode == 200) {
-      //   final data = jsonDecode(response.body);
-      //   Fluttertoast.showToast(msg: "Password reset successful");
-      //   Navigator.pop(context); // Or navigate to login screen
-      // } else {
-      //   Fluttertoast.showToast(
-      //     msg: 'Failed: ${response.statusCode}',
-      //     backgroundColor: Colors.red,
-      //   );
-      // }
+      final api = ApiService();
+      final response = await api.reset_Password(widget.userID.toString(), newPassword);
+
+      setState(() => isLoading = false);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if(data['status'] == true) {
+          Fluttertoast.showToast(msg: "${data['message']}");
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => LoginScreen()),
+                (route) => false,
+          ); // Or navigate to login screen
+        }else {
+          Fluttertoast.showToast(
+            msg: 'Failed: ${data['message']}',
+            backgroundColor: Colors.red,
+          );
+        }
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Failed: ${response.statusCode}',
+          backgroundColor: Colors.red,
+        );
+      }
     }
   }
 

@@ -11,19 +11,3 @@ class Points {
     required this.total,
   });
 }
-
-class RewardList {
-  final String id;
-  final String merchantName;
-  final String description;
-  final int points;
-  final DateTime date;
-
-  RewardList({
-    required this.id,
-    required this.merchantName,
-    required this.description,
-    required this.points,
-    required this.date,
-  });
-}

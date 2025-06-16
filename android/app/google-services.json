@@ -1,30 +1,21 @@
 {
   "project_info": {
-    "project_number": "878126192232",
-    "project_id": "productreward-bc1d8",
-    "storage_bucket": "productreward-bc1d8.firebasestorage.app"
+    "project_number": "389789106640",
+    "project_id": "archgod-71172",
+    "storage_bucket": "archgod-71172.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:878126192232:android:80dea18d371660b72c4ddd",
+        "mobilesdk_app_id": "1:389789106640:android:3b69f6fd480c349c5579d5",
         "android_client_info": {
-          "package_name": "com.app.productreward"
+          "package_name": "com.weboctopus.archgod"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "878126192232-a0tdsdrrua8ajevgddd0miffsdc9o7io.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.app.productreward",
-            "certificate_hash": "edffcff7ab807e86185cd154cf6c95b7cf7a1bb7"
-          }
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCNcVcEaHWu1F86N6IQ_s3JfuWihBX7QN8"
+          "current_key": "AIzaSyDM5W9kcfKRHKDWBVWlUf6yYuZUhOBXVLw"
         }
       ],
       "services": {

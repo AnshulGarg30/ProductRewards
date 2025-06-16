@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:productreward/core/network/api_service.dart';
 import 'package:productreward/presentation/themes/colors.dart';
+import 'package:productreward/presentation/view/screens/LoginScreen.dart';
 import 'package:productreward/presentation/view/screens/NotificationScreen.dart';
 import 'package:productreward/presentation/view/screens/forgot_password_screen.dart';
 import 'package:provider/provider.dart';
-import '../../controllers/profile_provider.dart';
+import '../../controllers/LoginController.dart';
+import '../../controllers/UserProvider.dart';
+import 'ChangepasswordScreen.dart';
 
 class ProfileScreen extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ProfileProvider>(context);
-
+    final userProvider = Provider.of<UserProvider>(context);
+    final controller = Provider.of<LoginController>(context);
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      body: provider.isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SafeArea(
+      body: SafeArea(
         child: Column(
           children: [
             // const SizedBox(height: 20),
@@ -23,7 +27,11 @@ class ProfileScreen extends StatelessWidget {
             Stack(
               alignment: Alignment.bottomRight,
               children: [
-                CircleAvatar(radius: 50, backgroundImage: NetworkImage(provider.user!.profileImageUrl)),
+                CircleAvatar(radius: 50,backgroundImage: NetworkImage(
+                  userProvider.userData?.image != null
+                      ? '${userProvider.userData!.image}'
+                      : 'https://i.pravatar.cc/300',
+                ),),
                 Container(
                   decoration: BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
                   padding: const EdgeInsets.all(5),
@@ -32,20 +40,30 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Text(provider.user!.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            Text(provider.user!.role, style: TextStyle(color: Colors.grey)),
+            Text(userProvider.userData?.name ?? "Albert Florest", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(userProvider.userData?.email ?? "", style: TextStyle(color: Colors.grey)),
             const SizedBox(height: 30),
             // buildProfileOption(Icons.person, 'Edit Profile'),
-            buildProfileOption(Icons.notifications, 'Notification', context),
+            // buildProfileOption(Icons.notifications, 'Notification', context, 0),
+            // buildProfileOption(Icons.notifications, 'Edit Profile', context, 0),
             // buildProfileOption(Icons.location_on, 'Shipping Address'),
-            buildProfileOption(Icons.lock, 'Change Password', context),
+            buildProfileOption(Icons.lock, 'Change Password', context, userProvider.userData?.id),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () async{
+                  await controller.logout();
+                  userProvider.clearUser();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) =>  LoginScreen()),
+                        (route) => false,
+                  );
+
+                },
                 icon: const Icon(Icons.logout, color: Colors.white,),
-                label: const Text('Sign Out', style: TextStyle(color: Colors.white),),
+                label: const Text('LogOut', style: TextStyle(color: Colors.white),),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   minimumSize: const Size.fromHeight(50),
@@ -60,7 +78,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget buildProfileOption(IconData icon, String title, BuildContext context) {
+  Widget buildProfileOption(IconData icon, String title, BuildContext context, String? userid) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: InkWell(
@@ -68,13 +86,18 @@ class ProfileScreen extends StatelessWidget {
           if(title == 'Change Password') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) =>  ForgotPasswordScreen()),
+              MaterialPageRoute(builder: (_) =>  ChangepasswordScreen(userID: userid,)),
             );
           }else if(title == 'Notification') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) =>  NotificationScreen()),
             );
+          }else if(title == 'Edit Profile') {
+            // Navigator.push(
+            //   context,
+              // MaterialPageRoute(builder: (_) =>  EditProfile()),
+            // );
           }
         },
         child: Container(

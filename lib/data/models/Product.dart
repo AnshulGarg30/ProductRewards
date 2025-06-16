@@ -5,6 +5,7 @@ class Product {
   final int status;
   final String createdAt;
   final String updatedAt;
+  final String point;
 
   Product({
     required this.id,
@@ -13,6 +14,7 @@ class Product {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    required this. point,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class Product {
       status: json['status'] as int,
       createdAt: json['created_at'] as String,
       updatedAt: json['updated_at'] as String,
+        point: json['point'] as String
     );
   }
 }

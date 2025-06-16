@@ -10,6 +10,8 @@ import '../../../core/network/api_service.dart';
 import '../../../core/utils/validators.dart';
 import '../../../data/datasource/auth_local_datasource.dart';
 import '../../../data/models/LoginResponse.dart';
+import '../../../main.dart';
+import '../../controllers/UserProvider.dart';
 import '../../themes/colors.dart';
 import 'HomeScreen.dart';
 import '../widgets/custom_text_field.dart';
@@ -22,29 +24,39 @@ class LoginScreen extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  final localDataSource = AuthLocalDataSource();
+  void _login(BuildContext context, LoginController controller, UserProvider userProvider) async{
 
+    final service = FirebaseMessagingService();
+    String? token = await service.getTokenSecurely();
+    print('Retrieved secure token: $token');
 
-  void _login(BuildContext context, LoginController controller) async{
     if (_formKey.currentState!.validate()) {
       print('Login data: ${emailController.text} and ${passwordController.text}');
       final api = ApiService();
-      final response = await api.login(emailController.text, passwordController.text);
+      final response = await api.login(emailController.text, passwordController.text, token ?? "");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         print('Login successful: $data');
-        final loginResponse = LoginResponse.fromJson(data);
-        if(loginResponse.status) {
-          await controller.login();
-          await localDataSource.saveUserData(data);
-          // Navigate to Welcome screen and clear stack
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) =>  HomeScreen()),
-                (route) => false,
-          );
+        if(data['status'] == true) {
+          final loginResponse = LoginResponse.fromJson(data);
+          if (loginResponse.status) {
+            await controller.login();
+            final userData = loginResponse.data;
+            userProvider.setUserData(userData);
+            print("local user data ${userProvider.loadUserData()}");
+            // Navigate to Welcome screen and clear stack
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => HomeScreen()),
+                  (route) => false,
+            );
+          } else {
+            Fluttertoast.showToast(
+                msg: loginResponse.message, backgroundColor: Colors.red);
+          }
         }else {
-          Fluttertoast.showToast(msg: loginResponse.message, backgroundColor: Colors.red);
+          Fluttertoast.showToast(
+              msg: "${data['message']}", backgroundColor: Colors.red);
         }
       } else {
         print('Login failed: ${response.statusCode}');
@@ -56,6 +68,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<LoginController>(context);
+    final userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -133,7 +146,7 @@ class LoginScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(24.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      _login(context, controller);
+                      _login(context, controller, userProvider);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,

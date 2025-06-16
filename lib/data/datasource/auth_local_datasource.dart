@@ -1,6 +1,7 @@
-import 'package:productreward/data/models/UserData.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+
+import '../models/LoginResponse.dart';
 
 
 class AuthLocalDataSource {
@@ -21,7 +22,7 @@ class AuthLocalDataSource {
   Future<void> clearLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(_loggedInKey);
-    await prefs.remove(_userDataKey);
+    prefs.remove(_userDataKey);
   }
 
   Future<void> saveUserData(UserData user) async {
