@@ -4,10 +4,12 @@ import 'package:productreward/presentation/view/screens/points_screen.dart';
 import 'package:productreward/presentation/view/screens/product_list_page.dart';
 import 'package:provider/provider.dart';
 import '../../../core/network/api_service.dart';
+import '../../controllers/LoginController.dart';
 import '../../controllers/UserProvider.dart';
 import '../../controllers/rewards_list_provider.dart';
 import 'ChangepasswordScreen.dart';
 import 'HistoryPage.dart';
+import 'LoginScreen.dart';
 import 'ProfileScreen.dart';
 import 'RedeemRequest.dart';
 
@@ -58,6 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    final controller = Provider.of<LoginController>(context);
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
@@ -102,6 +106,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) =>  ChangepasswordScreen(userID: userProvider.userData?.id)),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.logout),
+                title: Text("Logout"),
+                onTap: () async{
+                  await controller.logout();
+                  userProvider.clearUser();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) =>  LoginScreen()),
+                        (route) => false,
                   );
                 },
               ),
