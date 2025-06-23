@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart'; // Required for RouteObserver
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:productreward/presentation/controllers/HistoryProvider.dart';
 import 'package:productreward/presentation/controllers/LoginController.dart';
@@ -18,9 +22,10 @@ import 'domain/usecases/set_login_status.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:http/http.dart' as http;
-
 import 'firebase_options.dart';
+
+/// Global RouteObserver for tracking route changes
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +33,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
 
   // Initialize and handle Firebase Messaging token
   await FirebaseMessagingService().initialize();
@@ -65,16 +71,13 @@ class FirebaseMessagingService {
   static const _tokenKey = 'firebase_messaging_token';
 
   Future<void> initialize() async {
-    // Request permission (especially for iOS)
     NotificationSettings settings = await _messaging.requestPermission();
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // Get the token
       String? token = await _messaging.getToken();
       print('FCM Token: $token');
 
       if (token != null) {
-        // Save token encrypted locally
         await _saveTokenSecurely(token);
       }
     } else {
@@ -93,7 +96,6 @@ class FirebaseMessagingService {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Consumer<LoginController>(
@@ -102,6 +104,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           home: controller.isLoggedIn ? HomeScreen() : LoginScreen(),
+          navigatorObservers: [routeObserver], // 🔹 Register RouteObserver
         );
       },
     );

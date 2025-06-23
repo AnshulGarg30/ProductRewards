@@ -113,7 +113,7 @@ class _ProductCardState extends State<ProductCard> {
                   name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 12,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -122,7 +122,7 @@ class _ProductCardState extends State<ProductCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    if (type == 'product') ...[Text(
                       '$points Points',
                       style: const TextStyle(
                         color: Colors.blue,
@@ -130,14 +130,19 @@ class _ProductCardState extends State<ProductCard> {
                         fontSize: 13,
                       ),
                     ),
+                    ],
                     if (type == 'catalog') ...[
                       _isDownloading
-                          ? SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          value: _progress,
+                          ? Container(
+                        margin: const EdgeInsets.only(bottom: 8.0),
+                        // Adjust as needed
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 4,
+                            value: _progress,
+                          ),
                         ),
                       )
                           : GestureDetector(
@@ -148,8 +153,23 @@ class _ProductCardState extends State<ProductCard> {
                             '${data.name}_${data.id}.pdf',
                           );
                         },
-                        child: const Icon(Icons.download,
-                            size: 16, color: Colors.blue),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                  Icons.download, size: 16, color: Colors.blue),
+                              const SizedBox(width: 4),
+                              // Space between icon and text
+                              const Text(
+                                'Download',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.blue),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ],

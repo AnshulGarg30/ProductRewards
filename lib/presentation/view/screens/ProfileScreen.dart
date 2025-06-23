@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:productreward/core/network/api_service.dart';
 import 'package:productreward/presentation/themes/colors.dart';
 import 'package:productreward/presentation/view/screens/LoginScreen.dart';
 import 'package:productreward/presentation/view/screens/NotificationScreen.dart';
-import 'package:productreward/presentation/view/screens/forgot_password_screen.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/LoginController.dart';
 import '../../controllers/UserProvider.dart';

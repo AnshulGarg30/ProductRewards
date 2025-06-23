@@ -1,61 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:productreward/core/network/api_service.dart';
 import 'package:productreward/presentation/themes/colors.dart';
-import 'package:productreward/presentation/view/screens/points_screen.dart';
+import 'package:productreward/presentation/view/screens/rewardlist.dart';
 import 'package:productreward/presentation/view/screens/product_list_page.dart';
 import 'package:provider/provider.dart';
-import '../../../core/network/api_service.dart';
 import '../../controllers/LoginController.dart';
 import '../../controllers/UserProvider.dart';
 import '../../controllers/rewards_list_provider.dart';
 import 'ChangepasswordScreen.dart';
 import 'HistoryPage.dart';
 import 'LoginScreen.dart';
-import 'ProfileScreen.dart';
 import 'RedeemRequest.dart';
+import '../../../main.dart';
+import 'WebViewScreen.dart'; // Ensure this includes your routeObserver
 
 class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _hasFetchedPoints = false;
 
   @override
   void initState() {
     super.initState();
-    Provider.of<UserProvider>(context, listen: false).loadUserData(); // uses AuthLocalDataSource
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<RewardsListProvider>(context, listen: false).fetchRewards();
-    });
+    Provider.of<UserProvider>(context, listen: false).loadUserData();
   }
-
-  bool _hasFetchedPoints = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
 
     final userProvider = Provider.of<UserProvider>(context);
     final rewardsProvider = Provider.of<RewardsListProvider>(context, listen: false);
 
     if (!_hasFetchedPoints && userProvider.userData != null) {
       _hasFetchedPoints = true;
-      rewardsProvider.fetchPoints(userProvider.userData!.id.toString(), userProvider);
+      rewardsProvider.fetchPoints(userProvider.userData!.id.toString(), userProvider, "didChangeDependencies");
     }
   }
 
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
 
-  final pages = [
-    ProductListPage(),
-    PointsScreen(),
-    // ProfileScreen(),
-  ];
+  @override
+  void didPopNext() {
+    _fetchPoints();
+  }
 
-  final titles = ['ArchGod', 'Rewards'/*, 'Profile'*/];
+  void _fetchPoints() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final rewardsProvider = Provider.of<RewardsListProvider>(context, listen: false);
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+    if (mounted && userProvider.userData != null) {
+      rewardsProvider.fetchPoints(userProvider.userData!.id.toString(), userProvider, "didPopNext");
+    }
+  }
 
+  Future<void> _refreshHomeScreen() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final rewardsProvider = Provider.of<RewardsListProvider>(context, listen: false);
+
+    await userProvider.loadUserData();
+
+    if (userProvider.userData != null) {
+      await rewardsProvider.fetchPoints(
+        userProvider.userData!.id.toString(),
+        userProvider,
+        "pullToRefresh",
+      );
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,19 +90,32 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
-        child: SingleChildScrollView(  // <-- Add this
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               UserAccountsDrawerHeader(
                 decoration: BoxDecoration(color: AppColors.primary),
-                currentAccountPicture: CircleAvatar(radius: 50,backgroundImage: NetworkImage(
-                  userProvider.userData?.image != null
-                      ? '${userProvider.userData!.image}'
-                      : 'https://i.pravatar.cc/300',
-                ),),
-                accountName: Text(userProvider.userData?.name ?? "Albert Florest",),
-                accountEmail: Text(userProvider.userData?.email ?? "", style: TextStyle(color: Colors.grey)),
+                currentAccountPicture: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: NetworkImage(
+                    userProvider.userData?.image != null
+                        ? '${userProvider.userData!.image}'
+                        : 'https://i.pravatar.cc/300',
+                  ),
+                ),
+                accountName: Text(userProvider.userData?.name ?? "Albert Florest"),
+                accountEmail: Text(
+                  userProvider.userData?.email ?? "",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.redeem),
+                title: Text("Reward Items"),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => Rewardlist()));
+                },
               ),
               ListTile(
                 leading: Icon(Icons.history),
@@ -85,7 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) =>  HistoryPage(userID: userProvider.userData?.id,))
+                    MaterialPageRoute(
+                      builder: (_) => HistoryPage(userID: userProvider.userData?.id),
+                    ),
                   );
                 },
               ),
@@ -94,8 +134,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text("Redeem Request"),
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) =>  RedeemRequest(userID: userProvider.userData?.id,))
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RedeemRequest(userID: userProvider.userData?.id),
+                    ),
                   );
                 },
               ),
@@ -105,32 +147,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) =>  ChangepasswordScreen(userID: userProvider.userData?.id)),
+                    MaterialPageRoute(
+                      builder: (_) => ChangepasswordScreen(userID: userProvider.userData?.id),
+                    ),
                   );
                 },
               ),
+              buildWebItem(icon: Icons.privacy_tip, label: 'Privacy Policy', url: ApiService().privacypolicy),
+              buildWebItem(icon: Icons.policy_outlined, label: 'Terms & Conditions', url: ApiService().termcondition),
+              buildWebItem(icon: Icons.contact_mail, label: 'Contact Us', url: ApiService().contactus),
               ListTile(
                 leading: Icon(Icons.logout),
                 title: Text("Logout"),
-                onTap: () async{
+                onTap: () async {
                   await controller.logout();
                   userProvider.clearUser();
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (_) =>  LoginScreen()),
+                    MaterialPageRoute(builder: (_) => LoginScreen()),
                         (route) => false,
                   );
                 },
               ),
-              // Add more ListTiles here
             ],
           ),
         ),
       ),
-
       appBar: AppBar(
-        title: Text(_currentIndex == 0 ? 'ArchGod' : titles[_currentIndex]
-          , style: TextStyle(color: Colors.white),),
+        title: Text('ArchGod', style: TextStyle(color: Colors.white)),
         backgroundColor: AppColors.primary,
         leading: IconButton(
           icon: const Icon(Icons.menu),
@@ -138,17 +182,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        selectedItemColor: AppColors.primary,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag), label: 'Product'),
-          BottomNavigationBarItem(icon: Icon(Icons.card_giftcard), label: 'Rewards'),
-          // BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+      body: RefreshIndicator(
+        onRefresh: _refreshHomeScreen,
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: ProductListPage(),
+        ),
       ),
     );
   }
+
+  Widget buildWebItem({required IconData icon, required String label, required String url}) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(label),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => WebViewScreen(url: url, title: label),
+          ),
+        );
+      },
+    );
+  }
+
 }

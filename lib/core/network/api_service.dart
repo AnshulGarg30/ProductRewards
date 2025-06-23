@@ -29,6 +29,9 @@ class ApiService {
   String get getHistory => '$_baseUrl/getHistory';
   String get getPoint => '$_baseUrl/getPoint';
   String get getReedemRequest => '$_baseUrl/getReedemRequest';
+  String get privacypolicy => 'https://archgod.webdeveloperhisar.com/privacy-policy';
+  String get contactus => 'https://archgod.webdeveloperhisar.com/contact';
+  String get termcondition => 'https://archgod.webdeveloperhisar.com/terms-condition';
 
 
   // Generic GET request

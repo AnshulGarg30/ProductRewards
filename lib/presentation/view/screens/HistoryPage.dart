@@ -95,12 +95,12 @@ class _HistoryPageState extends State<HistoryPage> {
                         const SizedBox(height: 3),
                         Row(
                           children: [
-                            if (item.debit != null)
+                            if (item.debit != 0 && item.debit != null)
                               Text(
                                 'Redeemed: -${item.debit} pts',
                                 style: const TextStyle(color: Colors.red, fontSize: 14),
                               ),
-                            if (item.credit != null)
+                            if (item.credit != 0 && item.credit != null)
                               Text(
                                 'Earned: +${item.credit} pts',
                                 style: const TextStyle(color: Colors.green, fontSize: 14),

@@ -32,7 +32,7 @@ class RewardsListProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchPoints(String userID, UserProvider userProvider) async {
+  Future<void> fetchPoints(String userID, UserProvider userProvider, String from) async {
     final response = await api.getPoints(userID);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -41,7 +41,7 @@ class RewardsListProvider extends ChangeNotifier {
         if (loginResponse.status) {
           final userData = loginResponse.data;
           userProvider.setUserData(userData);
-          debugPrint("fetchpoints ${userData.email}");
+          debugPrint("fetchpoints $from");
         }
       }
     }
@@ -56,11 +56,11 @@ class RewardsListProvider extends ChangeNotifier {
         // You can handle success message or update local state here
         final jsonResponse = jsonDecode(response.body);
         if(jsonResponse['status'] == true) {
-          final userJson = jsonResponse['data'];
-          final userData = UserData.fromJson(userJson);
-          userProvider.setUserData(userData);
-          debugPrint("saveuserdata ${userData.email}");
-          await fetchPoints(userId, userProvider);
+          // final userJson = jsonResponse['data'];
+          // final userData = UserData.fromJson(userJson);
+          // userProvider.setUserData(userData);
+          // debugPrint("saveuserdata ${userData.email}");
+          // await fetchPoints(userId, userProvider);
           return {
             'success': true,
             'message': jsonResponse['message'] ?? 'Redeem successful',
